@@ -16,15 +16,15 @@ class Normalizer(object):
 
     def __call__(self, img):
         if self.mean is not None:
-            img = self.__center(img)
+            img = self._center(img)
         if self.std is not None:
-            img = self.__scale(img)
+            img = self._scale(img)
         return img
 
-    def __center(self, img):
+    def _center(self, img):
         return img - self.mean
 
-    def __scale(self, img):
+    def _scale(self, img):
         return img / self.std
 
     @staticmethod

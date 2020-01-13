@@ -1,6 +1,6 @@
 from sklearn.model_selection import KFold
 from sklearn.utils import shuffle
-from lib.normalizer import Normalizer
+from normalizer import Normalizer
 import tensorflow as tf
 import numpy as np
 import math

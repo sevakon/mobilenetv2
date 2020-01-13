@@ -19,6 +19,21 @@ def get_model(input_shape, n_classes):
     return model
 
 
+def get_model_with_nn_head(input_shape, n_classes):
+    base_model = tf.keras.applications.MobileNetV2(input_shape=input_shape,
+                                                   include_top=False,
+                                                   weights='imagenet')
+    model = tf.keras.Sequential([
+                base_model,
+                tf.keras.layers.GlobalAveragePooling2D(),
+                tf.keras.layers.Dense(512, activation='relu'),
+                tf.keras.layers.Dropout(.1),
+                tf.keras.layers.Dense(n_classes, activation='softmax')
+            ])
+    model.summary()
+    return model
+
+
 def train(config, fold_idx):
     print(' ... TRAIN MODEL ON {} FOLD'.format(fold_idx))
     loader = Dataloader(img_size=config.input_size,

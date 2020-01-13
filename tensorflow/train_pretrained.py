@@ -1,5 +1,5 @@
-from lib.dataloader import Dataloader
-from lib.normalizer import Normalizer
+from dataloader import Dataloader
+from normalizer import Normalizer
 
 import tensorflow as tf
 import numpy as np

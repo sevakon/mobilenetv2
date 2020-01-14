@@ -103,8 +103,8 @@ class Dataloader(object):
             std = np.array((std['red'], std['green'], std['blue']))
         else:
             # values taken from ImageNet Dataset
-            mean = np.array(0.485, 0.456, 0.406)
-            std = np.array(0.229, 0.224, 0.225)
+            mean = np.array([0.485, 0.456, 0.406])
+            std = np.array([0.229, 0.224, 0.225])
             self.normalizer = Normalizer(mean, std)
         data = tf.data.Dataset.from_tensor_slices(
             (tf.constant(filenames), tf.constant(labels))
@@ -148,7 +148,9 @@ class Dataloader(object):
         ''' Parsing filename, label pair into float array '''
         ''' Performing normalization, size transformation '''
         img = tf.io.read_file(filename)
-        img = tf.image.decode_jpeg(img)
+        img = tf.image.decode_jpeg(img, channels=3)
+        img = tf.image.rgb_to_grayscale(img)
+        img = tf.image.grayscale_to_rgb(img)
         img = tf.image.resize(img, (self.img_size, self.img_size))
         img = tf.cast(img, tf.float32) / 255
         img = self.normalizer(img)
@@ -182,6 +184,8 @@ class Dataloader(object):
         self.filenames = []
         self.labels = np.zeros((self.size, len(self.classes)),
                                                     dtype='float32')
+        print(len(self.filenames))
+        print(self.labels.shape)
         for item in self.classes:
             item.index = counter
             paths = [os.path.join(item.path, f) for f \

@@ -1,5 +1,7 @@
+from callback import ValidationHistory
 from dataloader import Dataloader
 from normalizer import Normalizer
+
 
 import tensorflow as tf
 import numpy as np
@@ -34,6 +36,13 @@ def get_model_with_nn_head(input_shape, n_classes):
     return model
 
 
+def write_metrics_to_file(loss, acc, fold_idx):
+    file = open("pretrained_model/metrics_fold{}.txt".format(fold_idx), "x")
+    file.write('Best saved model validation accuracy: {}\n'.format(acc))
+    file.write('Best saved model validation loss: {}\n'.format(loss))
+    file.close()
+
+
 def train(config, fold_idx):
     print(' ... TRAIN MODEL ON {} FOLD'.format(fold_idx))
     loader = Dataloader(img_size=config.input_size,
@@ -55,7 +64,7 @@ def train(config, fold_idx):
                   metrics=[tf.keras.metrics.CategoricalAccuracy()])
 
 
-    filepath="model/pretrained_mobilenet_fold{}".format(fold_idx)
+    filepath="pretrained_model/mobilenet_fold{}".format(fold_idx)
     checkpoint = tf.keras.callbacks.ModelCheckpoint(filepath,
                                                     monitor='val_categorical_accuracy',
                                                     verbose=1,
@@ -63,7 +72,8 @@ def train(config, fold_idx):
                                                     mode='max')
     logdir = "logs/fold{}/".format(fold_idx)
     tensorboard = tf.keras.callbacks.TensorBoard(log_dir=logdir)
-    callbacks = [checkpoint, tensorboard]
+    val_history = ValidationHistory()
+    callbacks = [checkpoint, tensorboard, val_history]
 
     model.fit(train.repeat(),
               epochs=config.epochs,
@@ -71,6 +81,8 @@ def train(config, fold_idx):
               validation_data=val.repeat(),
               validation_steps=val_steps,
               callbacks=callbacks)
+
+    write_metrics_to_file(val_history.best_model_stats(mode='acc'))
 
 
 if __name__ == '__main__':

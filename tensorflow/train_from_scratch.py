@@ -1,6 +1,7 @@
+from callback import ValidationHistory
+from mobilenetv2 import MobileNetV2
 from dataloader import Dataloader
 from normalizer import Normalizer
-from mobilenetv2 import MobileNetV2
 
 import tensorflow as tf
 import numpy as np
@@ -11,6 +12,12 @@ def write_stats_to_file(mean, std, fold_idx):
     file = open("model/norm_fold{}.txt".format(fold_idx), "x")
     file.write('Mean: r {}, g {}, b {}\n'.format(mean[0], mean[1], mean[2]))
     file.write('Std: r {}, g {}, b {}\n'.format(std[0], std[1], std[2]))
+    file.close()
+
+def write_metrics_to_file(loss, acc, fold_idx):
+    file = open("model/metrics_fold{}.txt".format(fold_idx), "x")
+    file.write('Best saved model validation accuracy: {}\n'.format(acc))
+    file.write('Best saved model validation loss: {}\n'.format(loss))
     file.close()
 
 
@@ -37,7 +44,7 @@ def train(config, fold_idx):
                   metrics=[tf.keras.metrics.CategoricalAccuracy()])
 
 
-    filepath="model/mobilenet_fold{}.hdf5".format(fold_idx)
+    filepath="model/mobilenet_fold{}".format(fold_idx)
     checkpoint = tf.keras.callbacks.ModelCheckpoint(filepath,
                                                     monitor='val_categorical_accuracy',
                                                     verbose=1,
@@ -45,7 +52,8 @@ def train(config, fold_idx):
                                                     mode='max')
     logdir = "logs/fold{}/".format(fold_idx)
     tensorboard = tf.keras.callbacks.TensorBoard(log_dir=logdir)
-    callbacks = [checkpoint, tensorboard]
+    val_history = ValidationHistory()
+    callbacks = [checkpoint, tensorboard, val_history]
 
     model.fit(train.repeat(),
               epochs=config.epochs,
@@ -53,6 +61,8 @@ def train(config, fold_idx):
               validation_data=val.repeat(),
               validation_steps=val_steps,
               callbacks=callbacks)
+
+    write_metrics_to_file(val_history.best_model_stats(mode='acc'))
 
 
 if __name__ == '__main__':

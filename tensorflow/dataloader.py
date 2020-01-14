@@ -1,6 +1,7 @@
 from sklearn.model_selection import KFold
 from sklearn.utils import shuffle
 from normalizer import Normalizer
+import matplotlib.pyplot as plt
 import tensorflow as tf
 import numpy as np
 import math
@@ -99,13 +100,13 @@ class Dataloader(object):
         steps = math.ceil(len(filenames)/batch_size)
         if normalize:
             mean, std = Normalizer.calc_mean_and_std(filenames, self.img_size)
-            mean = np.array((mean['red'], mean['green'], mean['blue']))
-            std = np.array((std['red'], std['green'], std['blue']))
+            mean = np.array([mean['red'], mean['green'], mean['blue']])
+            std = np.array([std['red'], std['green'], std['blue']])
         else:
             # values taken from ImageNet Dataset
             mean = np.array([0.485, 0.456, 0.406])
             std = np.array([0.229, 0.224, 0.225])
-            self.normalizer = Normalizer(mean, std)
+        self.normalizer = Normalizer(mean, std)
         data = tf.data.Dataset.from_tensor_slices(
             (tf.constant(filenames), tf.constant(labels))
         )
@@ -142,7 +143,6 @@ class Dataloader(object):
         data = data.map(self.parse_fn).batch(batch_size)
         data = data.prefetch(1)
         return data, steps
-
 
     def parse_fn(self, filename, label):
         ''' Parsing filename, label pair into float array '''
@@ -184,8 +184,6 @@ class Dataloader(object):
         self.filenames = []
         self.labels = np.zeros((self.size, len(self.classes)),
                                                     dtype='float32')
-        print(len(self.filenames))
-        print(self.labels.shape)
         for item in self.classes:
             item.index = counter
             paths = [os.path.join(item.path, f) for f \
@@ -194,6 +192,7 @@ class Dataloader(object):
             self.labels[idx:idx + item.size, item.index] = 1.0
             idx += item.size
             counter += 1
+
         self.filenames, self.labels = shuffle(self.filenames, \
                                 self.labels, random_state=self.seed)
 

@@ -44,7 +44,7 @@ class Normalizer(object):
             image = tf.io.read_file(filename)
             image = tf.image.decode_jpeg(image)
             image = tf.image.resize(image, (img_size, img_size))
-            img = tf.cast(img, tf.float32) / 255
+            image = tf.cast(image, tf.float32) / 255
             image = image.numpy()
 
             red = image[:, :, 0].flatten().tolist()

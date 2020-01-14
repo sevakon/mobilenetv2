@@ -39,7 +39,7 @@ def train(config, fold_idx):
 
     filepath="model/mobilenet_fold{}.hdf5".format(fold_idx)
     checkpoint = tf.keras.callbacks.ModelCheckpoint(filepath,
-                                                    monitor='val_acc',
+                                                    monitor='val_categorical_accuracy',
                                                     verbose=1,
                                                     save_best_only=True,
                                                     mode='max')

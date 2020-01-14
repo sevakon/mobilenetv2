@@ -1,5 +1,5 @@
-from lib.dataloader import Dataloader
-from lib.normalizer import Normalizer
+from dataloader import Dataloader
+from normalizer import Normalizer
 
 import tensorflow as tf
 import numpy as np
@@ -57,7 +57,7 @@ def train(config, fold_idx):
 
     filepath="model/pretrained_mobilenet_fold{}".format(fold_idx)
     checkpoint = tf.keras.callbacks.ModelCheckpoint(filepath,
-                                                    monitor='val_acc',
+                                                    monitor='val_categorical_accuracy',
                                                     verbose=1,
                                                     save_best_only=True,
                                                     mode='max')

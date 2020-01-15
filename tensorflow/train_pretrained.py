@@ -82,7 +82,7 @@ def train(config, fold_idx):
               validation_steps=val_steps,
               callbacks=callbacks)
 
-    write_metrics_to_file(val_history.best_model_stats(mode='acc'))
+    write_metrics_to_file(val_history.best_model_stats('acc'))
 
 
 if __name__ == '__main__':

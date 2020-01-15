@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 
-class ValidationHistory(tf.keras.callbacs.Callback):
+class ValidationHistory(tf.keras.callbacks.Callback):
     ''' Keras Callback class for recording
     history of all validation accuracies and losses'''
     def on_train_begin(self, logs={}):

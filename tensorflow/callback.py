@@ -12,7 +12,7 @@ class ValidationHistory(tf.keras.callbacks.Callback):
         self.accuracies.append(logs.get('val_categorical_accuracy'))
         self.losses.append(logs.get('val_loss'))
 
-    def best_model_stats(mode):
+    def best_model_stats(self, mode):
         ''' returns stats of the best model on val
         Args
             mode = 'acc'   returns model with best val acc

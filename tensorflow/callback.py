@@ -8,7 +8,7 @@ class ValidationHistory(tf.keras.callbacks.Callback):
         self.accuracies = []
         self.losses = []
 
-    def on_batch_end(self, batch, logs={}):
+    def on_epoch_end(self, batch, logs={}):
         self.accuracies.append(logs.get('val_categorical_accuracy'))
         self.losses.append(logs.get('val_loss'))
 
@@ -21,7 +21,7 @@ class ValidationHistory(tf.keras.callbacks.Callback):
             tuple, (loss, acc) for best saved model
         '''
         if mode == 'acc':
-            idx = self.accuracies.index(min(self.accuracies))
+            idx = self.accuracies.index(max(self.accuracies))
         elif model == 'loss':
             idx = self.losses.index(min(self.losses))
         else:

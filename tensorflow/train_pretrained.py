@@ -36,15 +36,15 @@ def get_model_with_nn_head(input_shape, n_classes):
     return model
 
 
-def write_metrics_to_file(loss, acc, fold_idx):
+def write_metrics_to_file(loss_acc, fold_idx):
     file = open("pretrained_model/metrics_fold{}.txt".format(fold_idx), "x")
-    file.write('Best saved model validation accuracy: {}\n'.format(acc))
-    file.write('Best saved model validation loss: {}\n'.format(loss))
+    file.write('Best saved model validation accuracy: {}\n'.format(loss_acc[1]))
+    file.write('Best saved model validation loss: {}\n'.format(loss_acc[0]))
     file.close()
 
 
 def train(config, fold_idx):
-    print(' ... TRAIN MODEL ON {} FOLD'.format(fold_idx))
+    print(' ... TRAIN MODEL ON FOLD #{}'.format(fold_idx + 1))
     loader = Dataloader(img_size=config.input_size,
                         n_folds=config.n_folds, seed=config.seed)
     loader = loader.fit(config.folder)
@@ -82,7 +82,7 @@ def train(config, fold_idx):
               validation_steps=val_steps,
               callbacks=callbacks)
 
-    write_metrics_to_file(val_history.best_model_stats('acc'))
+    write_metrics_to_file(val_history.best_model_stats('acc'), fold_idx)
 
 
 if __name__ == '__main__':
